@@ -1,0 +1,23 @@
+type Product {
+  id: ID!
+  name: String!
+}
+
+extend type User @key(fields: "userId someOtherId") {
+  userId: ID! @external
+  someOtherId: String! @external
+  favouriteProducts: [Product!]!
+  hello: String
+}
+
+type Mutation {
+  updateProduct: Product!
+}
+
+type Subscription {
+  productUpdates: Product!
+}
+
+type Query {
+  products: [Product!]!
+}

@@ -1,0 +1,19 @@
+type BlogPost {
+  id: ID!
+  title: String!
+}
+
+extend type User @key(fields: "userId someOtherId moreData { hello }") {
+  userId: ID! @external
+  someOtherId: String! @external
+  blogPosts: [BlogPost!]!
+}
+
+extend type Product @key(fields: "id") {
+  id: ID! @external
+  relevantBlogPostsForProduct: [BlogPost!]!
+}
+
+type Query {
+  blogPosts: [BlogPost!]!
+}

@@ -1,0 +1,13 @@
+{
+	"compilerOptions": {
+		"noEmit": true,
+		"strict": true,
+		"jsx": "react",
+		"esModuleInterop": true,
+		"allowJs": false,
+		"baseUrl": ".",
+		"target": "es2016",
+		"moduleResolution": "node",
+		"skipLibCheck": true
+	}
+}

@@ -1,0 +1,16 @@
+type InnerData {
+  hello: String!
+}
+
+type User {
+  userId: ID!
+  someOtherId: String!
+
+  name: String
+
+  moreData: InnerData
+}
+
+type Query {
+  users: [User!]!
+}

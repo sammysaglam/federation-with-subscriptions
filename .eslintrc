@@ -1,0 +1,7 @@
+{
+  "extends": "sammy",
+  "rules": {
+    "@calm/react-intl/missing-formatted-message": "off",
+    "no-console": "off"
+  }
+}
