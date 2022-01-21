@@ -7,7 +7,7 @@ This library currently only works with express servers.
 ## Installation
 
 ```bash
-yarn install federation-with-subscriptions
+yarn add federation-with-subscriptions
 ```
 
 ## Simple example

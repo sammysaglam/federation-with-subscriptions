@@ -10,7 +10,7 @@ import { usersMicroservice } from "./microservices/users";
     blogPostsMicroservice(),
   ]);
 
-  await createGateway({
+  const { sdl } = await createGateway({
     microservices,
 
     buildHttpHeaders: ({ req }) => ({

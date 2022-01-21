@@ -1,7 +1,11 @@
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { stitchSchemas } from "@graphql-tools/stitch";
 import { stitchingDirectives } from "@graphql-tools/stitching-directives";
-import { AsyncExecutor, observableToAsyncIterable } from "@graphql-tools/utils";
+import {
+  AsyncExecutor,
+  observableToAsyncIterable,
+  printSchemaWithDirectives,
+} from "@graphql-tools/utils";
 import { FilterRootFields, FilterTypes, wrapSchema } from "@graphql-tools/wrap";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import {
@@ -15,6 +19,7 @@ import {
   getOperationAST,
   OperationTypeNode,
   print,
+  printSchema,
 } from "graphql";
 import gql from "graphql-tag";
 import { Context, createClient, SubscribeMessage } from "graphql-ws";
@@ -234,5 +239,15 @@ export const createGateway = async ({
     console.log(`🚀 Gateway ready at http://localhost:4000/graphql`);
   });
 
-  return { expressApp: app };
+  return {
+    expressApp: app,
+
+    executableSchema: finalSchema,
+
+    // an option to print out the schema SDL
+    sdl: (options: { withDirectives?: boolean } = {}) =>
+      options.withDirectives ?? true
+        ? printSchemaWithDirectives(finalSchema)
+        : printSchema(finalSchema),
+  };
 };
