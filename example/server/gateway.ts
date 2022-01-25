@@ -10,13 +10,14 @@ import { usersMicroservice } from "./microservices/users";
     blogPostsMicroservice(),
   ]);
 
-  const { sdl } = await createGateway({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { sdl, expressApp, executableSchema } = await createGateway({
     microservices,
 
-    buildHttpHeaders: ({ req }) => ({
+    buildHttpHeaders: async ({ req }) => ({
       "authorization": req?.headers.authorization,
     }),
-    buildSubscriptionHeaders: ({ connectionParams }) => ({
+    buildSubscriptionHeaders: async ({ connectionParams }) => ({
       "authorization": connectionParams?.authorization,
     }),
   });
