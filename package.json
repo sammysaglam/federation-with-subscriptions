@@ -1,6 +1,6 @@
 {
   "name": "federation-with-subscriptions",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "dist/index.js",
   "author": "sammy@saglam.co",
   "license": "MIT",
@@ -8,7 +8,8 @@
   "scripts": {
     "start": "ts-node-dev ./example/server/gateway & webpack serve",
     "build": "tsc --project tsconfig.build.json",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "release": "npx standard-version"
   },
   "dependencies": {
     "@graphql-tools/stitch": "^8.4.3",
