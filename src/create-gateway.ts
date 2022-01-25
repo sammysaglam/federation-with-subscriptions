@@ -239,7 +239,7 @@ export const createGateway = async ({
       wsServer,
     );
 
-    console.log(`🚀 Gateway ready at http://localhost:4000/graphql`);
+    console.log(`🚀 Gateway ready at http://localhost:${port || 4000}/graphql`);
   });
 
   return {

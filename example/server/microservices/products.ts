@@ -40,7 +40,13 @@ export const productsMicroservice = () =>
       Subscription: {
         productUpdates: {
           subscribe: withFilter(
-            () => pubsub.asyncIterator(["PRODUCT_UPDATED"]),
+            (payload, variables, context) => {
+              console.log({
+                subscriptionContext: context,
+              });
+
+              return pubsub.asyncIterator(["PRODUCT_UPDATED"]);
+            },
             (payload, variables, context) => {
               console.log({
                 subscriptionContext: context,
@@ -70,6 +76,7 @@ export const productsMicroservice = () =>
 
       return {
         jwt: headers?.authorization,
+        hello: "subscription header",
       };
     },
   });
