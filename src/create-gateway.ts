@@ -95,8 +95,14 @@ export const createGateway = async ({
         operationName,
         extensions,
         context: contextForWsExecutor,
-      }) =>
-        observableToAsyncIterable({
+      }) => {
+        const subscriptionHeaders = await buildSubscriptionHeaders?.(
+          contextForWsExecutor?.value?.[0],
+          contextForWsExecutor?.value?.[1],
+          contextForWsExecutor?.value?.[2],
+        );
+
+        return observableToAsyncIterable({
           subscribe: (observer) => ({
             unsubscribe: subscriptionClient.subscribe(
               {
@@ -104,11 +110,7 @@ export const createGateway = async ({
                 variables: {
                   ...variables,
 
-                  __headers: buildSubscriptionHeaders?.(
-                    contextForWsExecutor?.value?.[0],
-                    contextForWsExecutor?.value?.[1],
-                    contextForWsExecutor?.value?.[2],
-                  ),
+                  __headers: subscriptionHeaders,
                 } as Record<string, any>,
                 operationName,
                 extensions,
@@ -137,6 +139,7 @@ export const createGateway = async ({
             ),
           }),
         });
+      };
 
       const executor: AsyncExecutor = async (args) => {
         // get the operation node of from the document that should be executed
