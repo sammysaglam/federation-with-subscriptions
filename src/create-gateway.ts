@@ -70,13 +70,23 @@ export const createGateway = async ({
 
         const fallback = { req: undefined, res: undefined };
 
+        const isSubscriptionContext =
+          contextForHttpExecutor?.type === "subscription";
+
         const fetchResult = await fetch(`http://${endpoint}`, {
           method: "POST",
           headers: {
-            ...(await buildHttpHeaders?.(
-              contextForHttpExecutor?.value || fallback,
-            )),
             "Content-Type": "application/json",
+
+            ...(isSubscriptionContext
+              ? await buildSubscriptionHeaders?.(
+                  contextForHttpExecutor?.value?.[0],
+                  contextForHttpExecutor?.value?.[1],
+                  contextForHttpExecutor?.value?.[2],
+                )
+              : await buildHttpHeaders?.(
+                  contextForHttpExecutor?.value || fallback,
+                )),
           },
           body: JSON.stringify({ query, variables, operationName, extensions }),
         });
@@ -217,7 +227,10 @@ export const createGateway = async ({
   const apolloServer = new ApolloExpressServer({
     schema: finalSchema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    context: (contextForHttpExecutor) => ({ value: contextForHttpExecutor }),
+    context: (contextForHttpExecutor) => ({
+      type: "http",
+      value: contextForHttpExecutor,
+    }),
   });
 
   await apolloServer.start();
@@ -234,7 +247,10 @@ export const createGateway = async ({
     useServer(
       {
         schema: finalSchema,
-        context: (...contextForWsExecutor) => ({ value: contextForWsExecutor }),
+        context: (...contextForWsExecutor) => ({
+          type: "subscription",
+          value: contextForWsExecutor,
+        }),
       },
       wsServer,
     );
