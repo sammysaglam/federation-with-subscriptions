@@ -1,6 +1,8 @@
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
 import React, { useState } from "react";
 
+import { socket } from "../../server/gateway";
+
 export const App = () => {
   const { data } = useQuery(
     gql`
@@ -52,6 +54,16 @@ export const App = () => {
       }
     `,
   );
+
+  socket.on("open", () => {
+    socket.send(
+      JSON.stringify({
+        x: 15.9,
+        y: 58.9,
+        url: "http://localhost/admin/app",
+      }),
+    );
+  });
 
   console.log("subscription:", subscriptionData);
 
