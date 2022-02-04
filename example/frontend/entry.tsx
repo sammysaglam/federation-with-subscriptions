@@ -61,7 +61,7 @@ class WebSocketLink extends ApolloLink {
   }
 }
 
-const websocketLink = new WebSocketLink({
+const websocketLinkForGraphql = new WebSocketLink({
   url: "ws://localhost:4000/graphql",
   connectionParams: () => ({
     authorization: `Bearer secretkeywashere`,
@@ -83,7 +83,7 @@ const splitLink = split(
       definition.operation === "subscription"
     );
   },
-  websocketLink,
+  websocketLinkForGraphql,
   httpLink,
 );
 
@@ -92,11 +92,35 @@ const client = new ApolloClient({
   link: splitLink,
 });
 
+const websocketConnection = new WebSocket("ws://localhost:4000");
+
+websocketConnection.onopen = () => {
+  websocketConnection.send("something from frontend");
+  console.log("opened connection");
+};
+websocketConnection.onerror = (error) => {
+  console.log(error);
+};
+websocketConnection.onmessage = (message) => {
+  console.log(message.data);
+};
+
 ReactDOM.render(
   <ApolloProvider client={client}>
     <BrowserRouter>
       <ThemeProvider theme={defaultTheme}>
         <GlobalStyles />
+        <button
+          onClick={() => websocketConnection.send("update some stuff!")}
+          type="button"
+        >
+          Send non-graphql websocket message – watch node.js console logs to
+          receive message
+        </button>
+        <br />
+        <br />
+        <hr />
+        <br />
         <App />
       </ThemeProvider>
     </BrowserRouter>

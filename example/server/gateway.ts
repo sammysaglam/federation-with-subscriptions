@@ -14,6 +14,10 @@ import { usersMicroservice } from "./microservices/users";
   const { sdl, expressApp, executableSchema } = await createGateway({
     microservices,
 
+    onWebsocketMessage: (data) => {
+      console.log("received:", data.toString());
+    },
+
     buildHttpHeaders: async ({ req }) => ({
       "authorization": req?.headers.authorization,
     }),

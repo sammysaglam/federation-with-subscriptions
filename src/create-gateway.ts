@@ -34,6 +34,8 @@ type CreateGatewayParameters = {
   port?: number;
   microservices: { endpoint: string }[];
 
+  onWebsocketMessage?: (message: WebSocket.RawData) => void;
+
   buildHttpHeaders?: ({
     req,
     res,
@@ -52,6 +54,7 @@ type CreateGatewayParameters = {
 export const createGateway = async ({
   microservices,
   port,
+  onWebsocketMessage,
   buildHttpHeaders,
   buildSubscriptionHeaders,
 }: CreateGatewayParameters) => {
@@ -238,10 +241,34 @@ export const createGateway = async ({
   apolloServer.applyMiddleware({ app, path: "/graphql", cors: true });
 
   const server = app.listen(port || 4000, () => {
-    // create and use the websocket server
     const wsServer = new WebSocketServer({
-      server,
-      path: "/graphql",
+      noServer: true,
+    });
+
+    const wsServerGraphql = new WebSocketServer({
+      noServer: true,
+    });
+
+    wsServer.on("connection", (ws) => {
+      if (onWebsocketMessage) {
+        ws.on("message", onWebsocketMessage);
+      }
+    });
+
+    server.on("upgrade", (request, socket, head) => {
+      const pathname = request.url;
+
+      if (pathname === "/graphql") {
+        wsServerGraphql.handleUpgrade(request, socket, head, (ws) => {
+          wsServerGraphql.emit("connection", ws);
+        });
+      } else if (pathname === "/") {
+        wsServer.handleUpgrade(request, socket, head, (ws) => {
+          wsServer.emit("connection", ws);
+        });
+      } else {
+        socket.destroy();
+      }
     });
 
     useServer(
@@ -252,7 +279,7 @@ export const createGateway = async ({
           value: contextForWsExecutor,
         }),
       },
-      wsServer,
+      wsServerGraphql,
     );
 
     console.log(`🚀 Gateway ready at http://localhost:${port || 4000}/graphql`);
