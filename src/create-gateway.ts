@@ -34,8 +34,8 @@ type CreateGatewayParameters = {
   port?: number;
   microservices: { endpoint: string }[];
 
-  onWebsocketMessage?: (message: WebSocket.RawData) => void;
-  onWebsocketClose?: () => void;
+  onWebsocketMessage?: (message: WebSocket.RawData, context: any) => void;
+  onWebsocketClose?: (context: any) => void;
 
   buildHttpHeaders?: ({
     req,
@@ -252,12 +252,26 @@ export const createGateway = async ({
     });
 
     wsServer.on("connection", (ws) => {
+      let context: any = {};
+
       if (onWebsocketMessage) {
-        ws.on("message", onWebsocketMessage);
+        ws.on("message", (message: WebSocket.RawData) => {
+          onWebsocketMessage(message, context);
+
+          try {
+            const messageParsed = JSON.parse(String(message));
+
+            if (messageParsed.action === "SET_CONTEXT") {
+              context = messageParsed.context;
+            }
+          } catch (error) {
+            // do nothing
+          }
+        });
       }
 
       if (onWebsocketClose) {
-        ws.on("close", onWebsocketClose);
+        ws.on("close", () => onWebsocketClose(context));
       }
     });
 

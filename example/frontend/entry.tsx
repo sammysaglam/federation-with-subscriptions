@@ -96,6 +96,9 @@ const websocketConnection = new WebSocket("ws://localhost:4000");
 
 websocketConnection.onopen = () => {
   websocketConnection.send("something from frontend");
+  websocketConnection.send(
+    JSON.stringify({ action: "SET_CONTEXT", context: { someData: "here" } }),
+  );
   console.log("opened connection");
 };
 websocketConnection.onerror = (error) => {

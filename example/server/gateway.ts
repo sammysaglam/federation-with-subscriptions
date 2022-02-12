@@ -17,6 +17,9 @@ import { usersMicroservice } from "./microservices/users";
     onWebsocketMessage: (data) => {
       console.log("received:", data.toString());
     },
+    onWebsocketClose: ((context: any) => {
+      console.log({ context });
+    }) as any,
 
     buildHttpHeaders: async ({ req }) => ({
       "authorization": req?.headers.authorization,
