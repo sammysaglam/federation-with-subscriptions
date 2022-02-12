@@ -35,6 +35,7 @@ type CreateGatewayParameters = {
   microservices: { endpoint: string }[];
 
   onWebsocketMessage?: (message: WebSocket.RawData) => void;
+  onWebsocketClose?: () => void;
 
   buildHttpHeaders?: ({
     req,
@@ -55,6 +56,7 @@ export const createGateway = async ({
   microservices,
   port,
   onWebsocketMessage,
+  onWebsocketClose,
   buildHttpHeaders,
   buildSubscriptionHeaders,
 }: CreateGatewayParameters) => {
@@ -252,6 +254,10 @@ export const createGateway = async ({
     wsServer.on("connection", (ws) => {
       if (onWebsocketMessage) {
         ws.on("message", onWebsocketMessage);
+      }
+
+      if (onWebsocketClose) {
+        ws.on("close", onWebsocketClose);
       }
     });
 
