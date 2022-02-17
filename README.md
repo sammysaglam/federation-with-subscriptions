@@ -1,5 +1,9 @@
 # Apollo Federation with Subscriptions
 
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sammysaglam/federation-with-subscriptions/blob/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/federation-with-subscriptions.svg?style=flat)](https://www.npmjs.com/package/federation-with-subscriptions)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+
 This library introduces subscriptions to Apollo Federation (which is currently not supported by apollo-server). Under the hood, it is using graphql-tools to convert the federation into schema-stitching SDL.
 
 This library currently only works with express servers.
