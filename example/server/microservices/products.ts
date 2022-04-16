@@ -1,8 +1,14 @@
+import {
+  ApolloServerPluginDrainHttpServer,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from "apollo-server-core";
+import express from "express";
 import fs from "fs";
 import { PubSub, withFilter } from "graphql-subscriptions";
+import http from "http";
 import path from "path";
 
-import { createMicroservice } from "../../../src";
+import { createExpressMicroservice } from "../../../src";
 
 const pubsub = new PubSub();
 
@@ -13,10 +19,12 @@ const db = {
   products: [{ id: "1", name: "T-shirt" }],
 };
 
-export const productsMicroservice = () =>
-  createMicroservice({
+export const productsMicroservice = async () => {
+  const app = express();
+  const httpServer = http.createServer(app);
+
+  const microservice = createExpressMicroservice({
     label: NAME,
-    port: PORT,
     typeDefs: fs.readFileSync(
       path.join(__dirname, "products.graphql"),
       "utf-8",
@@ -79,4 +87,16 @@ export const productsMicroservice = () =>
         hello: "subscription header",
       };
     },
+
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerPluginLandingPageGraphQLPlayground(),
+    ],
   });
+
+  await microservice.start();
+
+  const { listen } = microservice.applyMiddleware({ app });
+
+  return listen(PORT);
+};
