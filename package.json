@@ -1,6 +1,6 @@
 {
   "name": "federation-with-subscriptions",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "main": "dist/index.js",
   "author": "sammy@saglam.co",
   "license": "MIT",
