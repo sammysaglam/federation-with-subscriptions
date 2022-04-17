@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.1](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.0...v1.5.1) (2022-04-17)
+
+
+### Bug Fixes
+
+* tsconfig target ([#13](https://github.com/sammysaglam/federation-with-subscriptions/issues/13)) ([d6e6bfa](https://github.com/sammysaglam/federation-with-subscriptions/commit/d6e6bfa0c190de8de2895ded98a3496e53318ccd))
+
 ## [1.5.0](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.4.0...v1.5.0) (2022-04-17)
 
 
