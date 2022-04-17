@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.4.0...v1.5.0) (2022-04-17)
+
+
+### Features
+
+* allow runtime schema generation/customization ([#12](https://github.com/sammysaglam/federation-with-subscriptions/issues/12)) ([7d21fba](https://github.com/sammysaglam/federation-with-subscriptions/commit/7d21fbacbe07fefe4d449c5a8fb58cf98ec9bab6))
+
 ## [1.4.0](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.3.1...v1.4.0) (2022-04-17)
 
 ### [1.3.1](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.3.0...v1.3.1) (2022-02-17)
