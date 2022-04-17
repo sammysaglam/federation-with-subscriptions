@@ -3,8 +3,11 @@
     "strict": true,
     "esModuleInterop": true,
     "outDir": "dist",
-		"skipLibCheck": true,
-		"declaration": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "target": "ES6",
+    "moduleResolution": "Node",
+    "module": "CommonJS"
   },
   "include": ["./src"]
 }
