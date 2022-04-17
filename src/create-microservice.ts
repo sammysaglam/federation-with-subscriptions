@@ -19,11 +19,11 @@ export const createMicroservice = async ({
   subscriptionContext,
   label,
   port,
-}: CreateMicroserviceParams) => {
+}: Omit<CreateMicroserviceParams, "plugins">) => {
   const app = express();
   const httpServer = http.createServer(app);
 
-  const microservice = createExpressMicroservice({
+  const microservice = await createExpressMicroservice({
     label,
     typeDefs,
     resolvers,
