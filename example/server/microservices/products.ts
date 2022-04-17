@@ -23,13 +23,35 @@ export const productsMicroservice = async () => {
   const app = express();
   const httpServer = http.createServer(app);
 
-  const microservice = createExpressMicroservice({
+  const typeDefs = fs.readFileSync(
+    path.join(__dirname, "products.graphql"),
+    "utf-8",
+  );
+
+  const microservice = await createExpressMicroservice({
     label: NAME,
-    typeDefs: fs.readFileSync(
-      path.join(__dirname, "products.graphql"),
-      "utf-8",
-    ),
-    resolvers: {
+    typeDefs: async (context) => {
+      console.log("dude!", context);
+
+      // wait for 100ms (e.g. in real life, this could be a DB lookup)
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const newTypeDefs = `${typeDefs.replace(
+        /type\s+Product\s+{([^}])+}/m,
+        "",
+      )}
+        type Product {
+          id: ID!
+          name: String!
+          sammysSpecialField: String!
+          randomField${(Math.random() * 1000).toFixed(0)}: String
+        }
+      `;
+
+      return newTypeDefs;
+    },
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    resolvers: (apolloContext) => ({
       Query: {
         products: () => db.products,
       },
@@ -74,8 +96,9 @@ export const productsMicroservice = async () => {
           console.log({ queryContext: context });
           return root.id;
         },
+        sammysSpecialField: () => String(Math.random().toFixed(5)),
       },
-    },
+    }),
     context: ({ req }) => ({
       jwt: req.headers.authorization,
     }),

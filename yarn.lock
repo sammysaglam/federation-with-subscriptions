@@ -1045,12 +1045,6 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@calm/eslint-plugin-react-intl@https://github.com/sammysaglam/eslint-plugin-react-intl.git#add-jsx-fragments-support":
-  version "1.4.1"
-  resolved "https://github.com/sammysaglam/eslint-plugin-react-intl.git#f124ce4ad32bc98ab8297c50df4dcfec2c9c0407"
-  dependencies:
-    requireindex "~1.1.0"
-
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.6.tgz#d5e0706cf8c6acd8c6032f8d54070af261bbbb2f"
@@ -3696,12 +3690,11 @@ eslint-config-prettier@^8.3.0:
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-8.3.0.tgz#f7471b20b6fe8a9a9254cc684454202886a2dd7a"
   integrity sha512-BgZuLUSeKzvlL/VUjx/Yb787VQ26RU3gGjA3iiFvdsp/2bMfVIWUVP7tjxtjS0e+HP409cPlPvNkQloz8C91ew==
 
-eslint-config-sammy@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-sammy/-/eslint-config-sammy-2.0.0.tgz#d3e6dbc65d2459a879dea188424978b6ebc0aea4"
-  integrity sha512-McvyCOMOdFJNv1fQHJ7irac1uxXg/LzwwyyrvasT/WV0N/joUvpEhn5nOj0RMvtj28OODMNiPwWzJ/P7/gicPA==
+eslint-config-sammy@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-sammy/-/eslint-config-sammy-2.1.1.tgz#edd2946656f408989aa27e89eda19c196bee619f"
+  integrity sha512-7HcZ1Wc+kK9IzCAnayOqcGkFWcXm8vbZvP2yKrh5Ki+h4NfOJgTrIcgQaoXsz5y15xWihn+06bawE0a5yaw0kA==
   dependencies:
-    "@calm/eslint-plugin-react-intl" "https://github.com/sammysaglam/eslint-plugin-react-intl.git#add-jsx-fragments-support"
     "@typescript-eslint/eslint-plugin" "^5.5.0"
     "@typescript-eslint/parser" "^5.5.0"
     eslint-config-prettier "^8.3.0"
@@ -3710,6 +3703,7 @@ eslint-config-sammy@^2.0.0:
     eslint-plugin-jest "^25.3.0"
     eslint-plugin-react "^7.27.1"
     eslint-plugin-react-hooks "^4.3.0"
+    eslint-plugin-react-intl-sammy "^1.4.2"
     eslint-plugin-simple-import-sort "^7.0.0"
     prettier "^2.5.0"
 
@@ -3779,6 +3773,13 @@ eslint-plugin-react-hooks@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.3.0.tgz#318dbf312e06fab1c835a4abef00121751ac1172"
   integrity sha512-XslZy0LnMn+84NEG9jSGR6eGqaZB3133L8xewQo3fQagbQuGt7a63gf+P1NGKZavEYEC3UXaWEAA/AqDkuN6xA==
+
+eslint-plugin-react-intl-sammy@^1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-intl-sammy/-/eslint-plugin-react-intl-sammy-1.4.2.tgz#e1f88fa6c771e58133da68773bf8ad72476df413"
+  integrity sha512-dt2BdVBZ4k6QYYglXSyL4z/B6BR6P4R5wPep8xh1NZSJKnYbCCNL8x6ItUMJTOSn8OSeThJDr2kNja0A9e5few==
+  dependencies:
+    requireindex "~1.1.0"
 
 eslint-plugin-react@^7.27.1:
   version "7.28.0"
