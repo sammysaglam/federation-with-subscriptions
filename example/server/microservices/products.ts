@@ -36,6 +36,8 @@ export const productsMicroservice = async () => {
       // wait for 100ms (e.g. in real life, this could be a DB lookup)
       await new Promise((resolve) => setTimeout(resolve, 100));
 
+      const dbLookupResult = [{ fieldKey: "color", type: "STRING" }];
+
       const newTypeDefs = `${typeDefs.replace(
         /type\s+Product\s+{([^}])+}/m,
         "",
@@ -44,14 +46,15 @@ export const productsMicroservice = async () => {
           id: ID!
           name: String!
           sammysSpecialField: String!
-          randomField${(Math.random() * 1000).toFixed(0)}: String
+          ${dbLookupResult.map(({ fieldKey }) => `${fieldKey}: String`)}
+          testField${(Math.random() * 1000).toFixed(0)}: String
         }
       `;
 
       return newTypeDefs;
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    resolvers: (apolloContext) => ({
+    resolvers: (context) => ({
       Query: {
         products: () => db.products,
       },

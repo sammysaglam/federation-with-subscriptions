@@ -8,10 +8,7 @@ import {
 } from "@graphql-tools/utils";
 import { FilterRootFields, FilterTypes, wrapSchema } from "@graphql-tools/wrap";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
-import {
-  ApolloServer as ApolloExpressServer,
-  ExpressContext,
-} from "apollo-server-express";
+import { ExpressContext } from "apollo-server-express";
 import { fetch } from "cross-undici-fetch";
 import express from "express";
 import {
@@ -27,39 +24,15 @@ import { useServer } from "graphql-ws/lib/use/ws";
 import http from "http";
 import WebSocket, { WebSocketServer } from "ws";
 
+import { ExtendedApolloServer } from "./extended-apollo-server";
+
 type Headers = Record<string, string | undefined | unknown>;
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-type CreateGatewayParameters = {
-  port?: number;
-  microservices: { endpoint: string }[];
-
-  onWebsocketMessage?: (message: WebSocket.RawData, context: any) => void;
-  onWebsocketClose?: (context: any) => void;
-
-  buildHttpHeaders?: ({
-    req,
-    res,
-  }: {
-    req: ExpressContext["req"] | undefined;
-    res: ExpressContext["res"] | undefined;
-  }) => Promise<Headers> | Headers;
-
-  buildSubscriptionHeaders?: (
-    context: Context,
-    message: SubscribeMessage,
-    args: ExecutionArgs,
-  ) => Promise<Headers> | Headers;
-};
-
-export const createGateway = async ({
-  microservices,
-  port,
-  onWebsocketMessage,
-  onWebsocketClose,
-  buildHttpHeaders,
-  buildSubscriptionHeaders,
-}: CreateGatewayParameters) => {
+const createSchema = async (
+  microservices: CreateGatewayParameters["microservices"],
+  buildHttpHeaders: CreateGatewayParameters["buildHttpHeaders"],
+  buildSubscriptionHeaders: CreateGatewayParameters["buildSubscriptionHeaders"],
+) => {
   const { stitchingDirectivesTransformer } = stitchingDirectives();
 
   const remoteSchemas = await Promise.all(
@@ -226,16 +199,65 @@ export const createGateway = async ({
     ],
   });
 
+  return finalSchema;
+};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type CreateGatewayParameters = {
+  port?: number;
+  microservices: { endpoint: string }[];
+
+  onWebsocketMessage?: (message: WebSocket.RawData, context: any) => void;
+  onWebsocketClose?: (context: any) => void;
+
+  buildHttpHeaders?: ({
+    req,
+    res,
+  }: {
+    req: ExpressContext["req"] | undefined;
+    res: ExpressContext["res"] | undefined;
+  }) => Promise<Headers> | Headers;
+
+  buildSubscriptionHeaders?: (
+    context: Context,
+    message: SubscribeMessage,
+    args: ExecutionArgs,
+  ) => Promise<Headers> | Headers;
+};
+
+export const createGateway = async ({
+  microservices,
+  port,
+  onWebsocketMessage,
+  onWebsocketClose,
+  buildHttpHeaders,
+  buildSubscriptionHeaders,
+}: CreateGatewayParameters) => {
+  const finalSchema = await createSchema(
+    microservices,
+    buildHttpHeaders,
+    buildSubscriptionHeaders,
+  );
+
   const app = express();
   const httpServer = http.createServer(app);
 
-  const apolloServer = new ApolloExpressServer({
+  const apolloServer = new ExtendedApolloServer({
     schema: finalSchema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     context: (contextForHttpExecutor) => ({
       type: "http",
       value: contextForHttpExecutor,
     }),
+    schemaCallback: async () => {
+      const schema = await createSchema(
+        microservices,
+        buildHttpHeaders,
+        buildSubscriptionHeaders,
+      );
+
+      return schema;
+    },
   });
 
   await apolloServer.start();
