@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.2](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.1...v1.5.2) (2022-04-18)
+
+
+### Bug Fixes
+
+* gateway should update with living schema ([#14](https://github.com/sammysaglam/federation-with-subscriptions/issues/14)) ([f8f7e06](https://github.com/sammysaglam/federation-with-subscriptions/commit/f8f7e0636b1645bae7cdd63e932b9727d92817de))
+
 ### [1.5.1](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.0...v1.5.1) (2022-04-17)
 
 
