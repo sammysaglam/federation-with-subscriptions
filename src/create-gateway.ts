@@ -10,7 +10,7 @@ import { FilterRootFields, FilterTypes, wrapSchema } from "@graphql-tools/wrap";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import { ExpressContext } from "apollo-server-express";
 import { fetch } from "cross-undici-fetch";
-import express from "express";
+import express, { Request } from "express";
 import {
   ExecutionArgs,
   getOperationAST,
@@ -32,6 +32,8 @@ const createSchema = async (
   microservices: CreateGatewayParameters["microservices"],
   buildHttpHeaders: CreateGatewayParameters["buildHttpHeaders"],
   buildSubscriptionHeaders: CreateGatewayParameters["buildSubscriptionHeaders"],
+
+  fallbackReq?: Request,
 ) => {
   const { stitchingDirectivesTransformer } = stitchingDirectives();
 
@@ -46,7 +48,7 @@ const createSchema = async (
       }) => {
         const query = print(document);
 
-        const fallback = { req: undefined, res: undefined };
+        const fallback = { req: fallbackReq, res: undefined };
 
         const isSubscriptionContext =
           contextForHttpExecutor?.type === "subscription";
@@ -249,11 +251,12 @@ export const createGateway = async ({
       type: "http",
       value: contextForHttpExecutor,
     }),
-    schemaCallback: async () => {
+    schemaCallback: async (req) => {
       const schema = await createSchema(
         microservices,
         buildHttpHeaders,
         buildSubscriptionHeaders,
+        req,
       );
 
       return schema;
