@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.3](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.2...v1.5.3) (2022-04-26)
+
+
+### Bug Fixes
+
+* pass req to createSchema as fallback ([#15](https://github.com/sammysaglam/federation-with-subscriptions/issues/15)) ([222ddb6](https://github.com/sammysaglam/federation-with-subscriptions/commit/222ddb6bd18f22878a63a69fd1ccd79606cddba4))
+
 ### [1.5.2](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.1...v1.5.2) (2022-04-18)
 
 
