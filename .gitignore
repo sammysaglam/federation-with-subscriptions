@@ -31,3 +31,5 @@ package-lock.json
 translations
 
 dist/
+
+.idea
