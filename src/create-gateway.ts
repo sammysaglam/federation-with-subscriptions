@@ -9,7 +9,6 @@ import {
 import { FilterRootFields, FilterTypes, wrapSchema } from "@graphql-tools/wrap";
 import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
 import { ExpressContext } from "apollo-server-express";
-import { fetch } from "cross-undici-fetch";
 import express, { Request } from "express";
 import {
   ExecutionArgs,
@@ -22,6 +21,7 @@ import gql from "graphql-tag";
 import { Context, createClient, SubscribeMessage } from "graphql-ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import http from "http";
+import fetch from "node-fetch";
 import WebSocket, { WebSocketServer } from "ws";
 
 import { ExtendedApolloServer } from "./extended-apollo-server";
