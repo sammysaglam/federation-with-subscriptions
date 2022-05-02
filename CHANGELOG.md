@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.3...v1.6.0) (2022-05-02)
+
+
+### Features
+
+* move from cross-undici-fetch to node-fetch ([#16](https://github.com/sammysaglam/federation-with-subscriptions/issues/16)) ([beb182f](https://github.com/sammysaglam/federation-with-subscriptions/commit/beb182f2a4b19be89cae4e1f842cc1c3098b5204))
+
 ### [1.5.3](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.2...v1.5.3) (2022-04-26)
 
 
