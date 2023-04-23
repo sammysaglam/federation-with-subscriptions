@@ -66,7 +66,7 @@ const blogPostsMicroservice = () =>
       type Mutation {
         updateBlogPost: BlogPost!
       }
-			
+
       type Subscription {
         blogPostUpdates: BlogPost!
       }
@@ -140,10 +140,10 @@ If you run the above in a Node.js environment, you can visit http://localhost:40
   users {
     id
     name
-     blogPosts {
-       id
-       title
-     }
+    blogPosts {
+      id
+      title
+    }
   }
 }
 ```
@@ -151,8 +151,8 @@ If you run the above in a Node.js environment, you can visit http://localhost:40
 ```graphql
 subscription {
   blogPostUpdates {
-     id
-     title
+    id
+    title
   }
 }
 ```

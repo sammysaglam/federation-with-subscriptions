@@ -1,34 +1,30 @@
+import { BaseContext } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { stitchSchemas } from "@graphql-tools/stitch";
 import { stitchingDirectives } from "@graphql-tools/stitching-directives";
-import {
-  AsyncExecutor,
-  observableToAsyncIterable,
-  printSchemaWithDirectives,
-} from "@graphql-tools/utils";
+import { AsyncExecutor, observableToAsyncIterable } from "@graphql-tools/utils";
 import { FilterRootFields, FilterTypes, wrapSchema } from "@graphql-tools/wrap";
-import { ApolloServerPluginDrainHttpServer } from "apollo-server-core";
-import { ExpressContext } from "apollo-server-express";
-import express, { Request } from "express";
+import axios from "axios";
+import { json } from "body-parser";
+import cors from "cors";
+import express, { Request, Response } from "express";
 import {
   ExecutionArgs,
   getOperationAST,
   OperationTypeNode,
   print,
-  printSchema,
 } from "graphql";
 import gql from "graphql-tag";
 import { Context, createClient, SubscribeMessage } from "graphql-ws";
 import { useServer } from "graphql-ws/lib/use/ws";
 import http from "http";
-import fetch from "node-fetch";
 import WebSocket, { WebSocketServer } from "ws";
 
-import { ExtendedApolloServer } from "./extended-apollo-server";
+import { ExtendedApolloServer } from "./ExtendedApolloServer";
 
-type Headers = Record<string, string | undefined | unknown>;
-
-const createSchema = async (
+const createGatewaySchema = async (
   microservices: CreateGatewayParameters["microservices"],
   buildHttpHeaders: CreateGatewayParameters["buildHttpHeaders"],
   buildSubscriptionHeaders: CreateGatewayParameters["buildSubscriptionHeaders"],
@@ -39,6 +35,7 @@ const createSchema = async (
 
   const remoteSchemas = await Promise.all(
     microservices.map(async ({ endpoint }) => {
+      // @ts-ignore
       const httpExecutor: AsyncExecutor = async ({
         document,
         variables,
@@ -53,25 +50,27 @@ const createSchema = async (
         const isSubscriptionContext =
           contextForHttpExecutor?.type === "subscription";
 
-        const fetchResult = await fetch(`http://${endpoint}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const fetchResult = await axios.post(
+          `http://${endpoint}`,
+          { query, variables, operationName, extensions },
+          {
+            headers: {
+              "Content-Type": "application/json",
 
-            ...(isSubscriptionContext
-              ? await buildSubscriptionHeaders?.(
-                  contextForHttpExecutor?.value?.[0],
-                  contextForHttpExecutor?.value?.[1],
-                  contextForHttpExecutor?.value?.[2],
-                )
-              : await buildHttpHeaders?.(
-                  contextForHttpExecutor?.value || fallback,
-                )),
+              ...(isSubscriptionContext
+                ? await buildSubscriptionHeaders?.(
+                    contextForHttpExecutor?.value?.[0],
+                    contextForHttpExecutor?.value?.[1],
+                    contextForHttpExecutor?.value?.[2],
+                  )
+                : await buildHttpHeaders?.(
+                    contextForHttpExecutor?.value || fallback,
+                  )),
+            },
           },
-          body: JSON.stringify({ query, variables, operationName, extensions }),
-        });
+        );
 
-        return fetchResult.json();
+        return fetchResult.data;
       };
 
       const subscriptionClient = createClient({
@@ -101,27 +100,32 @@ const createSchema = async (
                   ...variables,
 
                   __headers: subscriptionHeaders,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } as Record<string, any>,
                 operationName,
                 extensions,
               },
               {
-                next: (data) => observer.next && observer.next(data as any),
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                next: (data: any) => observer.next && observer.next(data),
                 error: (err) => {
                   if (!observer.error) {
                     return;
                   }
                   if (err instanceof Error) {
                     observer.error(err);
+                    return;
                   } else if (err instanceof CloseEvent) {
                     observer.error(
                       new Error(`Socket closed with event ${err.code}`),
                     );
+                    return;
                   } else if (Array.isArray(err)) {
                     // graphQLError[]
                     observer.error(
                       new Error(err.map(({ message }) => message).join(", ")),
                     );
+                    return;
                   }
                 },
                 complete: () => observer.complete && observer.complete(),
@@ -142,6 +146,7 @@ const createSchema = async (
         return httpExecutor(args);
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sdlResponse: any = await httpExecutor({
         document: gql`
           {
@@ -194,6 +199,8 @@ const createSchema = async (
             default:
               return true;
           }
+
+          return true;
         }
 
         return true;
@@ -204,70 +211,72 @@ const createSchema = async (
   return finalSchema;
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type CreateGatewayParameters = {
-  port?: number;
-  microservices: { endpoint: string }[];
+  readonly port?: number;
+  readonly microservices: readonly { readonly endpoint: string }[];
 
-  onWebsocketMessage?: (message: WebSocket.RawData, context: any) => void;
-  onWebsocketClose?: (context: any) => void;
+  readonly onWebsocketMessage?: (
+    message: WebSocket.RawData,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    context: any,
+  ) => void;
 
-  buildHttpHeaders?: ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly onWebsocketClose?: (context: any) => void;
+
+  readonly buildHttpHeaders?: ({
     req,
     res,
   }: {
-    req: ExpressContext["req"] | undefined;
-    res: ExpressContext["res"] | undefined;
-  }) => Promise<Headers> | Headers;
+    readonly req: Request | undefined;
+    readonly res: Response | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) => Promise<any> | any;
 
-  buildSubscriptionHeaders?: (
+  readonly buildSubscriptionHeaders?: (
     context: Context,
     message: SubscribeMessage,
     args: ExecutionArgs,
-  ) => Promise<Headers> | Headers;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) => Promise<any> | any;
 };
 
-export const createGateway = async ({
+export const createGateway = async <TContext extends BaseContext>({
   microservices,
-  port,
+  port = 4000,
   onWebsocketMessage,
   onWebsocketClose,
   buildHttpHeaders,
   buildSubscriptionHeaders,
 }: CreateGatewayParameters) => {
-  const finalSchema = await createSchema(
-    microservices,
-    buildHttpHeaders,
-    buildSubscriptionHeaders,
-  );
-
   const app = express();
   const httpServer = http.createServer(app);
 
-  const apolloServer = new ExtendedApolloServer({
-    schema: finalSchema,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    context: (contextForHttpExecutor) => ({
-      type: "http",
-      value: contextForHttpExecutor,
-    }),
-    schemaCallback: async (req) => {
-      const schema = await createSchema(
+  const apolloServer = new ExtendedApolloServer<TContext>({
+    schema: () =>
+      createGatewaySchema(
         microservices,
         buildHttpHeaders,
         buildSubscriptionHeaders,
-        req,
-      );
-
-      return schema;
-    },
+      ),
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
   await apolloServer.start();
 
-  apolloServer.applyMiddleware({ app, path: "/graphql", cors: true });
+  app.use(
+    "/graphql",
+    cors<cors.CorsRequest>(),
+    json(),
+    expressMiddleware(apolloServer, {
+      context: async (contextForHttpExecutor) => ({
+        type: "http",
+        value: contextForHttpExecutor,
+      }),
+    }),
+  );
 
-  const server = app.listen(port || 4000, () => {
+  const server = httpServer.listen({ port }, async () => {
     const wsServer = new WebSocketServer({
       noServer: true,
     });
@@ -277,8 +286,10 @@ export const createGateway = async ({
     });
 
     wsServer.on("connection", (ws) => {
+      // eslint-disable-next-line functional/no-let, @typescript-eslint/no-explicit-any
       let context: any = {};
 
+      // eslint-disable-next-line functional/no-conditional-statements
       if (onWebsocketMessage) {
         ws.on("message", (message: WebSocket.RawData) => {
           onWebsocketMessage(message, context);
@@ -288,6 +299,7 @@ export const createGateway = async ({
 
             if (messageParsed.action === "SET_CONTEXT") {
               context = messageParsed.context;
+              return;
             }
           } catch (error) {
             // do nothing
@@ -297,28 +309,36 @@ export const createGateway = async ({
 
       if (onWebsocketClose) {
         ws.on("close", () => onWebsocketClose(context));
+        return;
       }
     });
 
     server.on("upgrade", (request, socket, head) => {
       const pathname = request.url;
 
-      if (pathname === "/graphql") {
+      if (pathname === "/") {
         wsServerGraphql.handleUpgrade(request, socket, head, (ws) => {
           wsServerGraphql.emit("connection", ws);
         });
-      } else if (pathname === "/") {
+        return;
+      } else if (pathname === "/ws") {
         wsServer.handleUpgrade(request, socket, head, (ws) => {
           wsServer.emit("connection", ws);
         });
-      } else {
-        socket.destroy();
+        return;
       }
+
+      socket.destroy();
+      return;
     });
 
     useServer(
       {
-        schema: finalSchema,
+        schema: await createGatewaySchema(
+          microservices,
+          buildHttpHeaders,
+          buildSubscriptionHeaders,
+        ),
         context: (...contextForWsExecutor) => ({
           type: "subscription",
           value: contextForWsExecutor,
@@ -332,13 +352,5 @@ export const createGateway = async ({
 
   return {
     expressApp: app,
-
-    executableSchema: finalSchema,
-
-    // an option to print out the schema SDL
-    sdl: (options: { withDirectives?: boolean } = {}) =>
-      options.withDirectives ?? true
-        ? printSchemaWithDirectives(finalSchema)
-        : printSchema(finalSchema),
   };
 };
