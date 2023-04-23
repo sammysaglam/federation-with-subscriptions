@@ -1,7 +1,7 @@
 {
   "extends": "sammy",
   "rules": {
-    "@calm/react-intl/missing-formatted-message": "off",
+    "formatjs/no-literal-string-in-jsx": "off",
     "no-console": "off"
   }
 }

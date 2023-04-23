@@ -1,4 +1,4 @@
-import { createGateway } from "../../src/create-gateway";
+import { createGateway } from "../../src/createGateway";
 import { blogPostsMicroservice } from "./microservices/blog-posts";
 import { productsMicroservice } from "./microservices/products";
 import { usersMicroservice } from "./microservices/users";
@@ -11,15 +11,16 @@ import { usersMicroservice } from "./microservices/users";
   ]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { sdl, expressApp, executableSchema } = await createGateway({
+  const { expressApp } = await createGateway({
     microservices,
 
     onWebsocketMessage: (data) => {
       console.log("received:", data.toString());
     },
-    onWebsocketClose: ((context: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onWebsocketClose: (context: any) => {
       console.log({ context });
-    }) as any,
+    },
 
     buildHttpHeaders: async ({ req }) => ({
       "authorization": req?.headers.authorization,

@@ -1,14 +1,8 @@
-import {
-  ApolloServerPluginDrainHttpServer,
-  ApolloServerPluginLandingPageGraphQLPlayground,
-} from "apollo-server-core";
-import express from "express";
 import fs from "fs";
 import { PubSub, withFilter } from "graphql-subscriptions";
-import http from "http";
 import path from "path";
 
-import { createExpressMicroservice } from "../../../src";
+import { createMicroservice } from "../../../src";
 
 const pubsub = new PubSub();
 
@@ -20,22 +14,15 @@ const db = {
 };
 
 export const productsMicroservice = async () => {
-  const app = express();
-  const httpServer = http.createServer(app);
-
   const typeDefs = fs.readFileSync(
     path.join(__dirname, "products.graphql"),
     "utf-8",
   );
 
-  const microservice = await createExpressMicroservice({
+  const microservice = await createMicroservice({
     label: NAME,
-    typeDefs: async (context) => {
-      console.log("dude!", context);
-
-      // wait for 100ms (e.g. in real life, this could be a DB lookup)
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+    port: PORT,
+    typeDefs: async () => {
       const dbLookupResult = [{ fieldKey: "color", type: "STRING" }];
 
       const newTypeDefs = `${typeDefs.replace(
@@ -53,8 +40,7 @@ export const productsMicroservice = async () => {
 
       return newTypeDefs;
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    resolvers: (context) => ({
+    resolvers: () => ({
       Query: {
         products: () => db.products,
       },
@@ -95,14 +81,11 @@ export const productsMicroservice = async () => {
         hello: () => "world",
       },
       Product: {
-        id: (root, args, context) => {
-          console.log({ queryContext: context });
-          return root.id;
-        },
+        id: (root) => root.id,
         sammysSpecialField: () => String(Math.random().toFixed(5)),
       },
     }),
-    context: ({ req }) => ({
+    context: async ({ req }) => ({
       jwt: req.headers.authorization,
     }),
     subscriptionContext: (ctx, message, args, headers) => {
@@ -113,16 +96,7 @@ export const productsMicroservice = async () => {
         hello: "subscription header",
       };
     },
-
-    plugins: [
-      ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerPluginLandingPageGraphQLPlayground(),
-    ],
   });
 
-  await microservice.start();
-
-  const { listen } = microservice.applyMiddleware({ app });
-
-  return listen(PORT);
+  return microservice;
 };

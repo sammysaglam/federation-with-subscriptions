@@ -22,8 +22,9 @@ import { ThemeProvider } from "styled-components";
 import { App } from "./components/App";
 import { defaultTheme, GlobalStyles } from "./theme/theme";
 
+// eslint-disable-next-line functional/no-classes
 class WebSocketLink extends ApolloLink {
-  private client: Client;
+  private readonly client: Client;
 
   constructor(options: ClientOptions) {
     super();
@@ -62,7 +63,7 @@ class WebSocketLink extends ApolloLink {
 }
 
 const websocketLinkForGraphql = new WebSocketLink({
-  url: "ws://localhost:4000/graphql",
+  url: "ws://localhost:4000",
   connectionParams: () => ({
     authorization: `Bearer secretkeywashere`,
   }),
@@ -92,8 +93,9 @@ const client = new ApolloClient({
   link: splitLink,
 });
 
-const websocketConnection = new WebSocket("ws://localhost:4000");
+const websocketConnection = new WebSocket("ws://localhost:4000/ws");
 
+// eslint-disable-next-line functional/immutable-data
 websocketConnection.onopen = () => {
   websocketConnection.send("something from frontend");
   websocketConnection.send(
@@ -101,9 +103,11 @@ websocketConnection.onopen = () => {
   );
   console.log("opened connection");
 };
+// eslint-disable-next-line functional/immutable-data
 websocketConnection.onerror = (error) => {
   console.log(error);
 };
+// eslint-disable-next-line functional/immutable-data
 websocketConnection.onmessage = (message) => {
   console.log(message.data);
 };
@@ -117,7 +121,7 @@ ReactDOM.render(
           onClick={() => websocketConnection.send("update some stuff!")}
           type="button"
         >
-          Send non-graphql websocket message – watch node.js console logs to
+          Send non-graphql websocket message - watch node.js console logs to
           receive message
         </button>
         <br />

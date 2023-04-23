@@ -1,3 +1,4 @@
-export { createExpressMicroservice } from "./create-express-microservice";
-export { createGateway } from "./create-gateway";
-export { createMicroservice } from "./create-microservice";
+/* eslint-disable check-file/no-index */
+export { createGateway } from "./createGateway";
+export { createMicroservice } from "./createMicroservice";
+export { ExtendedApolloServer } from "./ExtendedApolloServer";
