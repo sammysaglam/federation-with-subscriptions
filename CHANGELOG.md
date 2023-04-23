@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.6.0...v2.0.0) (2023-04-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to apollo server 4 (#18)
+
+### Features
+
+* upgrade to apollo server 4 ([#18](https://github.com/sammysaglam/federation-with-subscriptions/issues/18)) ([c412cbe](https://github.com/sammysaglam/federation-with-subscriptions/commit/c412cbe6379a2a74aef614c54535948bc6ea8624))
+
 ## [1.6.0](https://github.com/sammysaglam/federation-with-subscriptions/compare/v1.5.3...v1.6.0) (2022-05-02)
 
 
