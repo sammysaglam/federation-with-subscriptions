@@ -33,7 +33,7 @@ export const blogPostsMicroservice = () =>
         relevantBlogPostsForProduct: () => db.blogPosts,
       },
     },
-    context: ({ req }) => ({
+    context: async ({ req }) => ({
       jwt: req.headers.authorization,
     }),
     subscriptionContext: (ctx, message, args, headers) => ({
