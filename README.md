@@ -1,4 +1,6 @@
-# Apollo Federation with Subscriptions
+# [DEPRECATED] Apollo Federation with Subscriptions
+
+> **NOTE: This project is deprecated as Federation now supports subscriptions without the need for any wrappers https://www.apollographql.com/blog/announcement/backend/federated-subscriptions-in-graphos-real-time-data-at-scale/.**
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/sammysaglam/federation-with-subscriptions/blob/master/LICENSE)
 [![npm version](https://img.shields.io/npm/v/federation-with-subscriptions.svg?style=flat)](https://www.npmjs.com/package/federation-with-subscriptions)
